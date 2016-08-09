@@ -140,4 +140,4 @@ public class AutoMode extends AppCompatActivity   {
 
 
 
-//Awika
+//Songpol
