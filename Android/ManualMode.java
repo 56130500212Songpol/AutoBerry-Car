@@ -1,26 +1,49 @@
 package com.example.pang.test;
 
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
 
 import com.jcraft.jsch.*;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.StatusLine;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.io.*;
+
 public class ManualMode extends AppCompatActivity implements View.OnClickListener {
 
     Button bSwitchM,bDisconnectM;
+    ImageButton bForward,bBackward,bLeft,bRight;
     ImageButton mArrowButton;
     EditText etName, etUsername, etPassword;
     Session session;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_manual);
+
+
 
         bSwitchM = (Button) findViewById(R.id.switchButtonM);
         bSwitchM.setOnClickListener(new View.OnClickListener() {
@@ -40,19 +63,97 @@ public class ManualMode extends AppCompatActivity implements View.OnClickListene
             }
         });
 
-/*        if (session.isConnected()){
-            AlertDialog alertDialog = new AlertDialog.Builder(ManualMode.this).create();
-            alertDialog.setTitle("Cannot Connect");
-            alertDialog.setMessage(getString(R.string.error_field_login));
-            alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
-                    new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                            //Toast.makeText(getApplicationContext(), "Selected : " + selectedItemText, Toast.LENGTH_SHORT).show();
-                            dialog.dismiss();// use dismiss to cancel alert dialog
-                        }
-                    });
-            alertDialog.show();
-        }*/
+        bForward = (ImageButton)findViewById(R.id.forwardButton);
+        bForward.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+            /* button is Forward */
+                    new RequestTask().execute("http://10.17.245.69/gpio.php?pin=7&status=1");
+                } else if (event.getAction() == MotionEvent.ACTION_UP) {
+                    new RequestTask().execute("http://10.17.245.69/gpio.php?pin=7&status=0");
+                }
+                return true;
+            }
+        });
+
+        bBackward = (ImageButton)findViewById(R.id.backwardButton);
+        bBackward.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+            /* button is Backward */
+                    new RequestTask().execute("http://10.17.245.69/gpio.php?pin=0&status=1");
+                } else if (event.getAction() == MotionEvent.ACTION_UP) {
+                    new RequestTask().execute("http://10.17.245.69/gpio.php?pin=0&status=0");
+                }
+                return true;
+            }
+        });
+
+        bRight = (ImageButton)findViewById(R.id.rightButton);
+        bRight.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+            /* button is Right */
+                    new RequestTask().execute("http://10.17.245.69/gpio.php?pin=2&status=1");
+                } else if (event.getAction() == MotionEvent.ACTION_UP) {
+                    new RequestTask().execute("http://10.17.245.69/gpio.php?pin=2&status=0");
+                }
+                return true;
+            }
+        });
+
+        bLeft = (ImageButton)findViewById(R.id.leftButton);
+        bLeft.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+            /* button is Left */
+                    new RequestTask().execute("http://10.17.245.69/gpio.php?pin=3&status=1");
+                } else if (event.getAction() == MotionEvent.ACTION_UP) {
+                    new RequestTask().execute("http://10.17.245.69/gpio.php?pin=3&status=0");
+                }
+                return true;
+            }
+        });
+
+    }
+
+    class RequestTask extends AsyncTask<String, String, String> {
+
+        @Override
+        protected String doInBackground(String... uri) {
+            HttpClient httpclient = new DefaultHttpClient();
+            HttpResponse response;
+            String responseString = null;
+            try {
+                response = httpclient.execute(new HttpGet(uri[0]));
+                StatusLine statusLine = response.getStatusLine();
+                if(statusLine.getStatusCode() == HttpStatus.SC_OK){
+                    ByteArrayOutputStream out = new ByteArrayOutputStream();
+                    response.getEntity().writeTo(out);
+                    responseString = out.toString();
+                    out.close();
+                } else{
+                    //Closes the connection.
+                    response.getEntity().getContent().close();
+                    throw new IOException(statusLine.getReasonPhrase());
+                }
+            } catch (ClientProtocolException e) {
+                //TODO Handle problems..
+            } catch (IOException e) {
+                //TODO Handle problems..
+            }
+            return responseString;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+            //Do anything with response..
+        }
     }
 
     @Override
