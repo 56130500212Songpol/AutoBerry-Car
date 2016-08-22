@@ -281,22 +281,22 @@ public class MainActivity extends AppCompatActivity {
             return session.isConnected();
         }
 
-        @Override
+         @Override
         protected void onPostExecute(final Boolean success) {
             mAuthTask = null;
             showProgress(false);
 
             if (success) {
                 //finish();
-               // Intent intent = new Intent(MainActivity.this, ManualMode.class);
-                //startActivity(intent);
-                //Toast.makeText(getApplicationContext(), "Connect succesfully " , Toast.LENGTH_SHORT).show();
-               // mLoginButton.setError(getString(R.string.success_field_loginl));
-              //  mLoginButton.requestFocus();
-                //mCancelButton.setVisibility(View.GONE);
-                AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
+                Intent intent = new Intent(MainActivity.this, ManualMode.class);
+                intent.putExtra("IP", mIP);
+                startActivity(intent);
+                Toast.makeText(getApplicationContext(), "Connect succesfully ", Toast.LENGTH_SHORT).show();
+                //mLoginButton.requestFocus();
+                mCancelButton.setVisibility(View.GONE);
+                /*AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
                 alertDialog.setTitle("Cannot Connect");
-                alertDialog.setMessage(""+session);
+                alertDialog.setMessage("" + session);
                 alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
@@ -304,18 +304,12 @@ public class MainActivity extends AppCompatActivity {
                                 dialog.dismiss();// use dismiss to cancel alert dialog
                             }
                         });
-                alertDialog.show();
+                alertDialog.show();*/
             } else {
-               // try {
-                    Intent intent = new Intent(MainActivity.this, ManualMode.class);
-                    //intent.putExtra("CONNECT_SESSION",session);
-                    startActivity(intent);
-                    //mLoginButton.setError(getString(R.string.error_field_login));
-                    //mLoginButton.requestFocus();
-                    //mCancelButton.setVisibility(View.GONE);
-                //}catch (final Exception e) {
-
-                //}
+                mLoginButton.setError(getString(R.string.error_field_login));
+                //mLoginButton.requestFocus();
+                Toast.makeText(getApplicationContext(), "Cannot Connect ", Toast.LENGTH_SHORT).show();
+                mCancelButton.setVisibility(View.GONE);
             }
         }
 
