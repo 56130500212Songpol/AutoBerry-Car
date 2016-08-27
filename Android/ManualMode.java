@@ -30,26 +30,23 @@ import java.io.*;
 
 public class ManualMode extends AppCompatActivity implements View.OnClickListener {
 
-    Button bSwitchM,bDisconnectM;
-    ImageButton bForward,bBackward,bLeft,bRight;
-    ImageButton mArrowButton;
-    EditText etName, etUsername, etPassword;
-    Session session;
-
-
+    Button bSwitchM, bDisconnectM;
+    ImageButton bForward, bBackward, bLeft, bRight;
+    String mIP;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_manual);
-
-
+        Intent intent = getIntent();
+        mIP = intent.getStringExtra("IP");
 
         bSwitchM = (Button) findViewById(R.id.switchButtonM);
         bSwitchM.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(ManualMode.this, AutoMode.class);
+                intent.putExtra("IP", mIP);
                 startActivity(intent);
             }
         });
@@ -63,63 +60,64 @@ public class ManualMode extends AppCompatActivity implements View.OnClickListene
             }
         });
 
-        bForward = (ImageButton)findViewById(R.id.forwardButton);
+        bForward = (ImageButton) findViewById(R.id.forwardButton);
         bForward.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 if (event.getAction() == MotionEvent.ACTION_DOWN) {
             /* button is Forward */
-                    new RequestTask().execute("http://10.17.245.69/gpio.php?pin=7&status=1");
+                    new RequestTask().execute("http://"+mIP+"/gpio.php?pin=7&status=1");
                 } else if (event.getAction() == MotionEvent.ACTION_UP) {
-                    new RequestTask().execute("http://10.17.245.69/gpio.php?pin=7&status=0");
+                    new RequestTask().execute("http://"+mIP+"/gpio.php?pin=7&status=0");
                 }
                 return true;
             }
         });
 
-        bBackward = (ImageButton)findViewById(R.id.backwardButton);
+        bBackward = (ImageButton) findViewById(R.id.backwardButton);
         bBackward.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 if (event.getAction() == MotionEvent.ACTION_DOWN) {
             /* button is Backward */
-                    new RequestTask().execute("http://10.17.245.69/gpio.php?pin=0&status=1");
+                    new RequestTask().execute("http://"+mIP+"/gpio.php?pin=0&status=1");
                 } else if (event.getAction() == MotionEvent.ACTION_UP) {
-                    new RequestTask().execute("http://10.17.245.69/gpio.php?pin=0&status=0");
+                    new RequestTask().execute("http://"+mIP+"/gpio.php?pin=0&status=0");
                 }
                 return true;
             }
         });
 
-        bRight = (ImageButton)findViewById(R.id.rightButton);
+        bRight = (ImageButton) findViewById(R.id.rightButton);
         bRight.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 if (event.getAction() == MotionEvent.ACTION_DOWN) {
             /* button is Right */
-                    new RequestTask().execute("http://10.17.245.69/gpio.php?pin=2&status=1");
+                    new RequestTask().execute("http://"+mIP+"/gpio.php?pin=2&status=1");
                 } else if (event.getAction() == MotionEvent.ACTION_UP) {
-                    new RequestTask().execute("http://10.17.245.69/gpio.php?pin=2&status=0");
+                    new RequestTask().execute("http://"+mIP+"/gpio.php?pin=2&status=0");
                 }
                 return true;
             }
         });
 
-        bLeft = (ImageButton)findViewById(R.id.leftButton);
+        bLeft = (ImageButton) findViewById(R.id.leftButton);
         bLeft.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 if (event.getAction() == MotionEvent.ACTION_DOWN) {
             /* button is Left */
-                    new RequestTask().execute("http://10.17.245.69/gpio.php?pin=3&status=1");
+                    new RequestTask().execute("http://"+mIP+"/gpio.php?pin=3&status=1");
                 } else if (event.getAction() == MotionEvent.ACTION_UP) {
-                    new RequestTask().execute("http://10.17.245.69/gpio.php?pin=3&status=0");
+                    new RequestTask().execute("http://"+mIP+"/gpio.php?pin=3&status=0");
                 }
                 return true;
             }
         });
 
     }
+
 
     class RequestTask extends AsyncTask<String, String, String> {
 
