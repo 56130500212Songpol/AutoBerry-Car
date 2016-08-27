@@ -40,6 +40,7 @@ public class ManualMode extends AppCompatActivity implements View.OnClickListene
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(ManualMode.this, AutoMode.class);
+                intent.putExtra("IP", mIP);
                 startActivity(intent);
             }
         });
@@ -110,6 +111,7 @@ public class ManualMode extends AppCompatActivity implements View.OnClickListene
         });
 
     }
+
 
     class RequestTask extends AsyncTask<String, String, String> {
 
