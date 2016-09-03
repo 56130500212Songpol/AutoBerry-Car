@@ -1,8 +1,11 @@
 package com.example.pang.test;
 
+import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -13,6 +16,7 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 import android.graphics.Color;
 import android.widget.ArrayAdapter;
+
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -64,15 +68,6 @@ public class AutoMode extends AppCompatActivity {
             }
         });
 
-        bStart = (Button) findViewById(R.id.startButton);
-        bStart.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                new RequestTask().execute("http://" + mIP + "/destination.php?destination=" + Des);
-
-            }
-        });
-
         final Spinner spinner = (Spinner) findViewById(R.id.spinner);
 
         // Initializing a String Array
@@ -95,10 +90,12 @@ public class AutoMode extends AppCompatActivity {
                     // Disable the first item from Spinner
                     // First item will be use for hint
                     return false;
+
                 } else {
                     return true;
                 }
             }
+
 
             @Override
             public View getDropDownView(int position, View convertView, ViewGroup parent) {
@@ -113,45 +110,76 @@ public class AutoMode extends AppCompatActivity {
                 return view;
             }
         };
+
+
         spinnerArrayAdapter.setDropDownViewResource(R.layout.spinner_item);
         spinner.setAdapter(spinnerArrayAdapter);
 
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, final int position, long id) {
-                String selectedItemText = (String) parent.getItemAtPosition(position);
+                final String selectedItemText = (String) parent.getItemAtPosition(position);
                 // If user change the default selection
                 // First item is disable and it is used for hint
-                if (position > 0) {
-                    AlertDialog alertDialog = new AlertDialog.Builder(AutoMode.this).create();
-                    alertDialog.setTitle("Confirmation");
-                    alertDialog.setMessage("Here is android alert dialog message " + selectedItemText);
-                    alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
-                            new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int which) {
-                                    if (position == 1) {
-                                        Des = "A";
-                                    }
-                                    if (position == 2) {
-                                        Des = "B";
-                                    }
-                                    if (position == 3) {
-                                        Des = "C";
-                                    }
-                                    if (position == 4) {
-                                        Des = "D";
-                                    }
-                                    //Toast.makeText(getApplicationContext(), "Selected : " + selectedItemText, Toast.LENGTH_SHORT).show();
-                                    dialog.dismiss();// use dismiss to cancel alert dialog
-                                }
-                            });
-                    alertDialog.show();
+                bStart = (Button) findViewById(R.id.startButton);
+                bStart.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(AutoMode.this);
+                        alertDialogBuilder.setTitle("Confirmation");
+                        alertDialogBuilder
+                                .setMessage("Select destination " + selectedItemText)
+                                .setCancelable(false)
+                                .setPositiveButton("No", new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        // if this button is clicked, close
+                                        // current activity
+                                        dialog.cancel();
 
+                                    }
+                                })
+                                .setNegativeButton("Yes", new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        // if this button is clicked, just close
+                                        // the dialog box and do nothing
+                                        new RequestTask().execute("http://" + mIP + "/destination.php?destination=" + Des);
+                                        final ProgressDialog progressDialog = new ProgressDialog(AutoMode.this, R.style.AppTheme_Dark_Dialog);
+                                        progressDialog.setIndeterminate(true);
+                                        progressDialog.setMessage("Authenticating...");
+                                        progressDialog.show();
+
+                                    }
+                                });
+                        // create alert dialog
+                        AlertDialog alertDialog = alertDialogBuilder.create();
+
+                        // show itd
+                        alertDialog.show();
+
+
+                    }
+                });
+
+
+
+                if (position > 0) {
+
+                    if (position == 1) {
+                        Des = "A";
+                    }
+                    if (position == 2) {
+                        Des = "B";
+                    }
+                    if (position == 3) {
+                        Des = "C";
+                    }
+                    if (position == 4) {
+                        Des = "D";
+                    }
 
                 }
 
             }
-
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
@@ -160,21 +188,6 @@ public class AutoMode extends AppCompatActivity {
         });
     }
 
-
-    public void showDialog(View view) {
-        AlertDialog alertDialog = new AlertDialog.Builder(AutoMode.this).create();
-        alertDialog.setTitle("Confirmation");
-        alertDialog.setMessage("Here is android alert dialog message");
-        // Alert dialog button
-        alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-
-                        dialog.dismiss();// use dismiss to cancel alert dialog
-                    }
-                });
-        alertDialog.show();
-    }
 
     class RequestTask extends AsyncTask<String, String, String> {
 
